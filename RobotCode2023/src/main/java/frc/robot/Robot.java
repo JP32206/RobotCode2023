@@ -182,17 +182,17 @@ public class Robot extends TimedRobot {
     RLY = y + z * Math.sin(RLtangent);
 
  
-    motor_FRang.set(pid.calculate(-FR_coder.getPosition(),Math.toDegrees(Math.atan2(FRY, FRX)) + 185);
-    motor_FRmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_FRang.get()));
+    motor_FRang.set(pid.calculate(-FR_coder.getPosition(),Math.toDegrees(Math.atan2(FRY, FRX)) + 185) * angSpeedMax);
+    motor_FRmag.set((Math.hypot(FLY, FLX) * magSpeedMax) + (0.36 * motor_FRang.get()));
 
-    motor_FLang.set(pid.calculate(-FL_coder.getPosition(),Math.toDegrees(Math.atan2(FLY, FLX)) + 100);
-    motor_FLmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_FLang.get()));
+    motor_FLang.set(pid.calculate(-FL_coder.getPosition(),Math.toDegrees(Math.atan2(FLY, FLX)) + 100) * angSpeedMax);
+    motor_FLmag.set((Math.hypot(FLY, FLX) * magSpeedMax) + (0.36 * motor_FLang.get()));
 
-    motor_RRang.set(pid.calculate(-RR_coder.getPosition(),Math.toDegrees(Math.atan2(RRY, RRX)) + 120);
-    motor_RRmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_RRang.get()));
+    motor_RRang.set(pid.calculate(-RR_coder.getPosition(),Math.toDegrees(Math.atan2(RRY, RRX)) + 120) * angSpeedMax);
+    motor_RRmag.set((Math.hypot(FLY, FLX) * magSpeedMax) + (0.36 * motor_RRang.get()));
 
-    motor_RLang.set(pid.calculate(-RL_coder.getPosition(),Math.toDegrees(Math.atan2(RLY, RLX)) + 165);
-    motor_RLmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_RLang.get()));
+    motor_RLang.set(pid.calculate(-RL_coder.getPosition(),Math.toDegrees(Math.atan2(RLY, RLX)) + 165) * angSpeedMax);
+    motor_RLmag.set((Math.hypot(FLY, FLX) * magSpeedMax) + (0.36 * motor_RLang.get()));
 
   }
 
