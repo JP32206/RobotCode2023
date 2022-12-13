@@ -63,33 +63,23 @@ public class Robot extends TimedRobot {
 
   private double FRX;
   private double FRY;
-  private double FRtangent = 175;
+  private double FRtangent = Math.PI*1.75;
 
   private double FLX;
   private double FLY;
-  private double FLtangent = 225;
+  private double FLtangent = Math.PI*0.25;
 
   private double RRX;
   private double RRY;
-  private double RRtangent = 0;
+  private double RRtangent = Math.PI*1.25;
 
   private double RLX;
   private double RLY;
-  private double RLtangent = 315;
+  private double RLtangent = Math.PI*0.75;
 
-  // resultant vectors
-  private double FRAng;
-  private double FRMag;
+  private double angSpeedMax = 0.2;
+  private double magSpeedMax = 0.8;
 
-  private double FLAng;
-  private double FLMag;
-
-  private double RRAng;
-  private double RRMag;
-
-  private double RLAng;
-  private double RLMag;
-  //
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -161,15 +151,10 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    pid.setTolerance(1);
     pid.enableContinuousInput(0, 360);
-    FR_coder.setPositionToAbsolute();
     FR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    FL_coder.setPositionToAbsolute();
     FL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    RR_coder.setPositionToAbsolute();
     RR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    RL_coder.setPositionToAbsolute();
     RL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
   }
 
@@ -183,45 +168,30 @@ public class Robot extends TimedRobot {
   }
 
   private void drive(double x, double y, double z) {
-    // ..A = predetermined tangential angle
-    // ..Ang = desired wheel ang
-    // ..X = controller + z component
-    // ..Y = controller + z component
-
-    // Front Right
+    
     FRX = x + z * Math.cos(FRtangent);
     FRY = y + z * Math.sin(FRtangent);
-
-    // Front left
+    
     FLX = x + z * Math.cos(FLtangent);
     FLY = y + z * Math.sin(FLtangent);
-
-    // Rear right
+    
     RRX = x + z * Math.cos(RRtangent);
     RRY = y + z * Math.sin(RRtangent);
-
-    // Rear left
+    
     RLX = x + z * Math.cos(RLtangent);
     RLY = y + z * Math.sin(RLtangent);
 
-    // set front right motors
-    pid.setSetpoint(Math.toDegrees(Math.atan2(FRY, FRX)) + 185);
-    motor_FRang.set(pid.atSetpoint() ? 0 : pid.calculate(-FR_coder.getAbsolutePosition()));
+ 
+    motor_FRang.set(pid.calculate(-FR_coder.getPosition(),Math.toDegrees(Math.atan2(FRY, FRX)) + 185);
     motor_FRmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_FRang.get()));
 
-    // set front left motors
-    pid.setSetpoint(Math.toDegrees(Math.atan2(FLY, FLX)) + 100);
-    motor_FLang.set(pid.atSetpoint() ? 0 : pid.calculate(-FL_coder.getAbsolutePosition()));
+    motor_FLang.set(pid.calculate(-FL_coder.getPosition(),Math.toDegrees(Math.atan2(FLY, FLX)) + 100);
     motor_FLmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_FLang.get()));
 
-    // set rear right motors
-    pid.setSetpoint(Math.toDegrees(Math.atan2(RRY, RRX)) + 120);
-    motor_RRang.set(pid.atSetpoint() ? 0 : pid.calculate(-RR_coder.getAbsolutePosition()));
+    motor_RRang.set(pid.calculate(-RR_coder.getPosition(),Math.toDegrees(Math.atan2(RRY, RRX)) + 120);
     motor_RRmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_RRang.get()));
 
-    // set rear left motors
-    pid.setSetpoint(Math.toDegrees(Math.atan2(RLY, RLX)) + 165);
-    motor_RLang.set(pid.atSetpoint() ? 0 : pid.calculate(-RL_coder.getAbsolutePosition()));
+    motor_RLang.set(pid.calculate(-RL_coder.getPosition(),Math.toDegrees(Math.atan2(RLY, RLX)) + 165);
     motor_RLmag.set((Math.hypot(FLY, FLX) / 10) + (0.36 * motor_RLang.get()));
 
   }
