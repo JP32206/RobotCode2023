@@ -55,24 +55,7 @@ public class Robot extends TimedRobot {
   CANCoder FL_coder = new CANCoder(11);
   CANCoder RR_coder = new CANCoder(10);
   CANCoder RL_coder = new CANCoder(12);
-
-
-  //
-
-  // motor controll vectors
-
-  private double FRX;
-  private double FRY;
-
-  private double FLX;
-  private double FLY;
-
-  private double RRX;
-  private double RRY;
-
-  private double RLX;
-  private double RLY;
-
+  
   private double xMax = 0.40;
   private double yMax = 0.40;
   private double zMax = 0.40;
@@ -147,7 +130,6 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    pid.setTolerance(1);
     pid.enableContinuousInput(0, 360);
     FR_coder.setPositionToAbsolute();
     FR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
@@ -170,48 +152,27 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-
-    drive(controller.getLeftX(), controller.getLeftY(), controller.getRightX());
-
+    drive(controller.getLeftX() * xMax, controller.getLeftY() * yMax, controller.getRightX()* zMax);
   }
 
   private void drive(double x, double y, double z) {
-    // ..A = predetermined tangential angle
-    // ..Ang = desired wheel ang
-    // ..X = controller + z component
-    // ..Y = controller + z component
-
-    x = x * xMax;
-    y = y * yMax;
-    z = z * zMax;
-
-    // Front Right
-    FRX = x + (z * 0.707);
-    FRY = y + (z * -0.707);
-
-    // Front left
-    FLX = x + (z * 0.707);
-    FLY = y + (z * 0.707);
-
-    // Rear right
-    RRX = x + (z * -0.707);
-    RRY = y + (z * -0.707);
-
-    // Rear left
-    RLX = x + (z * -0.707);
-    RLY = y + (z * 0.707);
-
-
-
+    driveModule(x + (z *  0.707),y + (z * -0.707),motor_FRang,motor_FRmag,FR_coder)
+    driveModule(x + (z *  0.707),y + (z *  0.707),motor_FLang,motor_FLmag,FL_coder)
+    driveModule(x + (z * -0.707),y + (z * -0.707),motor_RRang,motor_RRmag,RR_coder)
+    driveModule(x + (z * -0.707),y + (z *  0.707),motor_RLang,motor_RLmag,RL_coder)
   }
   
-    private void driveModule(double x, double y, double z,WPI_TalonFX angMotor ,WPI_TalonFX speedMotor ,CANCoder encoder) {
-      
+    private void driveModule(double x, double y,WPI_TalonFX angMotor ,WPI_TalonFX speedMotor ,CANCoder encoder) {
       targetAng = Math.toDegrees(Math.atan2(y, x))
-      targetMag = Math.hypot(RLY, RLX)
+      targetMag = Math.hypot(x, y)
         
-    motor_RLang.set(pid.calculate(RL_coder.getPosition(),targetAng)));
-    motor_RLmag.set((targetMag * magSpeedMax) + (-0.36 * motor_RLang.get()));
+      if(distance(encoder,targetAng>90){
+        targetAng+=180;
+        targetMag=-targetMag;
+      }
+        
+      angMotor.set(pid.calculate(encoder.getPosition(),targetAng)));
+      speedMotor.set((targetMag * magSpeedMax) + (-0.36 * motor_RLang.get()));
     }
 
   /** This function is called once when the robot is disabled. */
