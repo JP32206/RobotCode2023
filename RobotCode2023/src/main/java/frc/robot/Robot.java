@@ -166,15 +166,20 @@ public class Robot extends TimedRobot {
       targetAng = Math.toDegrees(Math.atan2(y, x))
       targetMag = Math.hypot(x, y)
         
-      if(distance(encoder,targetAng>90){
-        targetAng+=180;
-        targetMag=-targetMag;
+      if(distance(encoder,targetAng)>90){
+        targetAng += 180;
+        targetMag = -targetMag;
       }
         
       angMotor.set(pid.calculate(encoder.getPosition(),targetAng)));
       speedMotor.set((targetMag * magSpeedMax) + (-0.36 * motor_RLang.get()));
     }
 
+    public static int distance(int alpha, int beta) {
+        int phi = Math.abs(beta - alpha) % 360;       // This is either the distance or 360 - distance
+        int distance = phi > 180 ? 360 - phi : phi;
+        return distance;
+    }
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
