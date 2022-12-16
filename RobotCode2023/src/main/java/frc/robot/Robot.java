@@ -134,19 +134,15 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     pid.enableContinuousInput(0, 360);
-    FR_coder.setPositionToAbsolute();
     FR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     FR_coder.configSensorDirection(true);
     FR_coder.configMagnetOffset();
-    FL_coder.setPositionToAbsolute();
-    FL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    FL_coder.configAbsoluteSensorRange(SensorRange.Unsigned_0_to_360);
     FL_coder.configSensorDirection(true);
     FL_coder.configMagnetOffset();
-    RR_coder.setPositionToAbsolute();
     RR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     RR_coder.configSensorDirection(true);
     RR_coder.configMagnetOffset();
-    RL_coder.setPositionToAbsolute();
     RL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     RL_coder.configSensorDirection(true);
     RL_coder.configMagnetOffset();
@@ -169,10 +165,10 @@ public class Robot extends TimedRobot {
     x = controlerMag * Math.cos(controlerAng);
     y = controlerMag * Math.sin(controlerAng);
       
-    driveModule(x + (z *  0.707),y + (z * -0.707),motor_FRang,motor_FRmag,FR_coder.getPosition());
-    driveModule(x + (z *  0.707),y + (z *  0.707),motor_FLang,motor_FLmag,FL_coder.getPosition());
-    driveModule(x + (z * -0.707),y + (z * -0.707),motor_RRang,motor_RRmag,RR_coder.getPosition());
-    driveModule(x + (z * -0.707),y + (z *  0.707),motor_RLang,motor_RLmag,RL_coder.getPosition());
+    driveModule(x + (z *  0.707),y + (z * -0.707),motor_FRang,motor_FRmag,FR_coder.getAbsolutePosition());
+    driveModule(x + (z *  0.707),y + (z *  0.707),motor_FLang,motor_FLmag,FL_coder.getAbsolutePosition());
+    driveModule(x + (z * -0.707),y + (z * -0.707),motor_RRang,motor_RRmag,RR_coder.getAbsolutePosition());
+    driveModule(x + (z * -0.707),y + (z *  0.707),motor_RLang,motor_RLmag,RL_coder.getAbsolutePosition());
   }
   
     private void driveModule(double x, double y,WPI_TalonFX angMotor ,WPI_TalonFX speedMotor ,double encoder) {
