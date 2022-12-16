@@ -59,6 +59,9 @@ public class Robot extends TimedRobot {
   private double xMax = 0.40;
   private double yMax = 0.40;
   private double zMax = 0.40;
+  private double angSpeedMax = ;
+  private double magSpeedMax = ;
+
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -147,6 +150,7 @@ public class Robot extends TimedRobot {
     RL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     RL_coder.configSensorDirection(true);
     RL_coder.configMagnetOffset();
+    gyro.calibrate()
   }
 
   /** This function is called periodically during operator control. */
@@ -156,13 +160,18 @@ public class Robot extends TimedRobot {
   }
 
   private void drive(double x, double y, double z) {
-    driveModule(x + (z *  0.707),y + (z * -0.707),motor_FRang,motor_FRmag,FR_coder)
-    driveModule(x + (z *  0.707),y + (z *  0.707),motor_FLang,motor_FLmag,FL_coder)
-    driveModule(x + (z * -0.707),y + (z * -0.707),motor_RRang,motor_RRmag,RR_coder)
-    driveModule(x + (z * -0.707),y + (z *  0.707),motor_RLang,motor_RLmag,RL_coder)
+    controlerAng = Math.atan2(y, x) + gyro.getAngle();
+    controlerMag = Math.hypot(x, y);
+    x = controlerMag * Math.cos(controlerAng);
+    y = controlerMag * Math.sin(controlerAng);
+      
+    driveModule(x + (z *  0.707),y + (z * -0.707),motor_FRang,motor_FRmag,FR_coder.getPosition());
+    driveModule(x + (z *  0.707),y + (z *  0.707),motor_FLang,motor_FLmag,FL_coder.getPosition());
+    driveModule(x + (z * -0.707),y + (z * -0.707),motor_RRang,motor_RRmag,RR_coder.getPosition());
+    driveModule(x + (z * -0.707),y + (z *  0.707),motor_RLang,motor_RLmag,RL_coder.getPosition());
   }
   
-    private void driveModule(double x, double y,WPI_TalonFX angMotor ,WPI_TalonFX speedMotor ,CANCoder encoder) {
+    private void driveModule(double x, double y,WPI_TalonFX angMotor ,WPI_TalonFX speedMotor ,double encoder) {
       targetAng = Math.toDegrees(Math.atan2(y, x))
       targetMag = Math.hypot(x, y)
         
@@ -171,8 +180,8 @@ public class Robot extends TimedRobot {
         targetMag = -targetMag;
       }
         
-      angMotor.set(pid.calculate(encoder.getPosition(),targetAng)));
-      speedMotor.set((targetMag * magSpeedMax) + (-0.36 * motor_RLang.get()));
+      angMotor.set(pid.calculate(encoder,targetAng)));
+      speedMotor.set((targetMag * magSpeedMax) + (-0.36 * angMotor.get()));
     }
 
     public static int distance(int alpha, int beta) {
