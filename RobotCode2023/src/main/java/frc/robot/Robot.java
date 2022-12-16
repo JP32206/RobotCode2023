@@ -173,7 +173,7 @@ public class Robot extends TimedRobot {
   
     private void driveModule(double x, double y,WPI_TalonFX angMotor ,WPI_TalonFX speedMotor ,double encoder) {
       targetAng = Math.toDegrees(Math.atan2(y, x))
-      targetMag = Math.hypot(x, y)
+      targetMag = Math.hypot(x, y) / Math.hypot(2,2)
         
       if(distance(encoder,targetAng)>90){
         targetAng += 180;
