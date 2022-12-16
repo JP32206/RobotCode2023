@@ -157,11 +157,15 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     drive(controller.getLeftX() * xMax, controller.getLeftY() * yMax, controller.getRightX()* zMax);
+    
+    if(controler.getButtonA()){
+      gyro.reset();
+    }
   }
 
   private void drive(double x, double y, double z) {
-    controlerAng = Math.atan2(y, x) + gyro.getAngle();
-    controlerMag = Math.hypot(x, y);
+    double controlerAng = Math.atan2(y, x) + Math.toRadians(gyro.getAngle());
+    double controlerMag = Math.hypot(x, y);
     x = controlerMag * Math.cos(controlerAng);
     y = controlerMag * Math.sin(controlerAng);
       
