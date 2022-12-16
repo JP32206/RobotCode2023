@@ -180,7 +180,7 @@ public class Robot extends TimedRobot {
         targetMag = -targetMag;
       }
         
-      angMotor.set(pid.calculate(encoder,targetAng)));
+      angMotor.set(pid.calculate(encoder,targetAng) * angSpeedMax);
       speedMotor.set((targetMag * magSpeedMax) + (-0.36 * angMotor.get()));
     }
 
