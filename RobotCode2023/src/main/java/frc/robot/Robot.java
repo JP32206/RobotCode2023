@@ -132,16 +132,16 @@ public class Robot extends TimedRobot {
     pid.enableContinuousInput(0, 360);
     FR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     FR_coder.configSensorDirection(true);
-    FR_coder.configMagnetOffset(102);
+    FR_coder.configMagnetOffset(12);
     FL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     FL_coder.configSensorDirection(true);
-    FL_coder.configMagnetOffset(0);
+    FL_coder.configMagnetOffset(-90);
     RR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     RR_coder.configSensorDirection(true);
-    RR_coder.configMagnetOffset(-70);
+    RR_coder.configMagnetOffset(-160);
     RL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     RL_coder.configSensorDirection(true);
-    RL_coder.configMagnetOffset(-28);
+    RL_coder.configMagnetOffset(-118);
     gyro.calibrate();
   }
 
@@ -149,7 +149,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    drive(-controller.getLeftY() * 0.6, controller.getLeftX() * 0.6, controller.getRightX());
+    drive(controller.getLeftX() * 0.6, controller.getLeftY() * 0.6, controller.getRightX());
 
     if (controller.getAButtonPressed()) {
       gyro.reset();
@@ -163,10 +163,10 @@ public class Robot extends TimedRobot {
     x = Math.cos(controlerAng) * controlermag;
     y = Math.sin(controlerAng) * controlermag;
 
-    moduleDrive(motor_FRang, motor_FRmag, FR_coder.getAbsolutePosition(), x + (z * -0.707106), y + (z * 0.707106));
-    moduleDrive(motor_FLang, motor_FLmag, FL_coder.getAbsolutePosition(), x + (z * 0.707106), y + (z * 0.707106));
+    moduleDrive(motor_FRang, motor_FRmag, FR_coder.getAbsolutePosition(), x + (z *  0.707106), y + (z * -0.707106));
+    moduleDrive(motor_FLang, motor_FLmag, FL_coder.getAbsolutePosition(), x + (z *  0.707106), y + (z *  0.707106));
     moduleDrive(motor_RRang, motor_RRmag, RR_coder.getAbsolutePosition(), x + (z * -0.707106), y + (z * -0.707106));
-    moduleDrive(motor_RLang, motor_RLmag, RL_coder.getAbsolutePosition(), x + (z * 0.707106), y + (z * -0.707106));
+    moduleDrive(motor_RLang, motor_RLmag, RL_coder.getAbsolutePosition(), x + (z * -0.707106), y + (z *  0.707106));
 
   }
 
