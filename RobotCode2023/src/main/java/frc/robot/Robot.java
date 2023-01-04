@@ -56,9 +56,12 @@ public class Robot extends TimedRobot {
   CANCoder RR_coder = new CANCoder(10);
   CANCoder RL_coder = new CANCoder(12);
 
+  private double swerveSpeedCoeficent = -0.36;
   private double angSpeedMax = 0.3;
-  private double magSpeedMax = 0.90;
-
+  private double magSpeedMax = 1 - (angSpeedMax * -0.36)
+  private double Xmax = 0.6;
+  private double Ymax = 0.6;
+  private double Zmax = 1.0;
   /**
    * This function is run when the robot is first started up and should be used
    * for any
@@ -149,7 +152,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    drive(-controller.getLeftY() * 0.6, controller.getLeftX() * 0.6, controller.getRightX());
+    drive(-controller.getLeftY() * Xmax, controller.getLeftX() * Ymax, controller.getRightX() * Zmax);
 
     if (controller.getAButtonPressed()) {
       gyro.reset();
@@ -159,7 +162,7 @@ public class Robot extends TimedRobot {
   private void drive(double x, double y, double z) {
 
     double controlerAng = Math.atan2(y, x) - Math.toRadians(gyro.getAngle());
-    double controlermag = Math.hypot(x, y);
+    double controlermag = MathUtil.clamp(Math.hypot(x, y),0,1);
     x = Math.cos(controlerAng) * controlermag;
     y = Math.sin(controlerAng) * controlermag;
 
@@ -172,15 +175,20 @@ public class Robot extends TimedRobot {
 
   void moduleDrive(WPI_TalonFX angMotor, WPI_TalonFX magMotor, double encoderAng, double x, double y) {
     double targetAng = Math.toDegrees(Math.atan2(y, x));
-    double targetMag = Math.hypot(y, x);// scaled to range [-1,1]
+    double targetMag = Math.hypot(y, x) / (1 + Math.hypot(0.707106,0.707106));// scaled to range [-1,1]
+    double setAng
+    double setmag
 
     if (distance(encoderAng, targetAng) > 90) {
-      targetAng += 180;
-      targetMag = -targetMag;
+      setAng = targetAng + 180;
+      setmag = -targetMag;
+    }else{
+      setAng = targetAng;
+      setmag = targetMag;
     }
 
-    angMotor.set(pid.calculate(encoderAng, targetAng) * angSpeedMax);
-    magMotor.set((targetMag * magSpeedMax) + (-0.36 * angMotor.get()));
+    angMotor.set(pid.calculate(encoderAng, setAng) * angSpeedMax);
+    magMotor.set((setmag * magSpeedMax) + (swerveSpeedCoeficent * angMotor.get()));
   }
 
   public static double distance(double alpha, double beta) {
