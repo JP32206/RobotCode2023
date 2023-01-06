@@ -57,9 +57,7 @@ public class Robot extends TimedRobot {
   CANCoder RR_coder = new CANCoder(10);
   CANCoder RL_coder = new CANCoder(12);
 
-  private double swerveRatio = -0.36;
-  private double angSpeedMax = 0.3;
-  private double magSpeedMax = 1 - (angSpeedMax * -swerveRatio);
+  
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -71,6 +69,30 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+    
+    pid.enableContinuousInput(0, 360);
+    FR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    FR_coder.configSensorDirection(true);
+    FR_coder.configMagnetOffset(102);
+    FL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    FL_coder.configSensorDirection(true);
+    FL_coder.configMagnetOffset(0);
+    RR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    RR_coder.configSensorDirection(true);
+    RR_coder.configMagnetOffset(-70);
+    RL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    RL_coder.configSensorDirection(true);
+    RL_coder.configMagnetOffset(-28);
+    gyro.calibrate();
+    double robotX = 0;
+    double robotY = 0;
+
+    private double swerveRatio = -0.36;
+    private double angSpeedMax = 0.3;
+    private double magSpeedMax = 1 - (angSpeedMax * -swerveRatio);
+    
+    SmartDashboard.putNumber("angSpeedMax", angSpeedMax);
+    SmartDashboard.putNumber("magSpeedMax", magSpeedMax);
 
   }
 
@@ -101,6 +123,29 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("FL mag motor", motor_FLmag.get());
     SmartDashboard.putNumber("RR mag motor", motor_RRmag.get());
     SmartDashboard.putNumber("RL mag motor", motor_RLmag.get());
+    
+    //odometry
+    // raw sensor value -> rpm : raw sensor value * (60 * 10 / 2048)
+    // rpm -> wheel rpm : rpm / 6.75
+    // wheel rpm -> mps : wheel rpm * circumference(m)
+    // mps -> meeters per interval : mps / 50
+    // raw sensor value -> meeters per interval : raw sensor value * (600 / 2048 * circumference(m) / 6.75 / 50)
+    
+    // gearRatio = (600 / 2048 * circumference(m) / 6.75 / 50)
+    FR_Xspeed = 
+      Math.sin(FR_coder.getAbsolutePosition() - gyro.getAngle()) * (motor_FRmag.GetSelectedSensorVelocity() * gearRatio)
+    FR_Yspeed = 
+      Math.cos(FR_coder.getAbsolutePosition() - gyro.getAngle()) * (motor_FRmag.GetSelectedSensorVelocity() * gearRatio)
+    FL_Xspeed = 
+    FL_Yspeed = 
+    RR_Xspeed = 
+    RR_Yspeed = 
+    RL_Xspeed = 
+    RL_Yspeed = 
+    
+    robotX += (FR_Xspeed + FL_Xspeed + RR_Xspeed + RL_Xspeed);
+    robotY += (FR_Yspeed + FL_Yspeed + RR_Yspeed + RL_Yspeed);
+    robotAng = gyro.getAngle();
   }
 
   /**
@@ -145,23 +190,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    pid.enableContinuousInput(0, 360);
-    FR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    FR_coder.configSensorDirection(true);
-    FR_coder.configMagnetOffset(102);
-    FL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    FL_coder.configSensorDirection(true);
-    FL_coder.configMagnetOffset(0);
-    RR_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    RR_coder.configSensorDirection(true);
-    RR_coder.configMagnetOffset(-70);
-    RL_coder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-    RL_coder.configSensorDirection(true);
-    RL_coder.configMagnetOffset(-28);
-    gyro.calibrate();
-
-    SmartDashboard.putNumber("angSpeedMax", angSpeedMax);
-    SmartDashboard.putNumber("magSpeedMax", magSpeedMax);
+    
   }
 
   /** This function is called periodically during operator control. */
@@ -178,7 +207,7 @@ public class Robot extends TimedRobot {
   private void drive(double x, double y, double z) {
 
     double controlerAng = Math.atan2(y, x) - Math.toRadians(gyro.getAngle() - 90);// rotate by gyro for field
-    double controlermag = MathUtil.clamp(Math.hypot(x, y), -1, 1);
+    double controlermag = Math.pow(MathUtil.clamp(Math.hypot(x, y), -1, 1),3);
     x = Math.cos(controlerAng) * controlermag;
     y = Math.sin(controlerAng) * controlermag;
 
