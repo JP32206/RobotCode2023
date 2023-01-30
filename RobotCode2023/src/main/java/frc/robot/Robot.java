@@ -305,19 +305,16 @@ public class Robot extends TimedRobot {
      */
 
     drive(controller.getLeftX(), 0.0, 0.0);
-
-    if (controller.getAButtonPressed()) {
-      IMU.reset();
-    }
+    if (controller.getAButtonPressed()) {IMU.reset();}
+    
     double FRmoduleSpeed = moduleSpeed(motor_FRmag, motor_FRang);
-    double FRmoduleAng = CWgyroYaw + FR_coderPosition;
+    double FRmoduleAng = Math.toRadians(CWgyroYaw + FR_coderPosition);
     double velocityX = FRmoduleSpeed * Math.cos(FRmoduleAng);
     double velocityY = FRmoduleSpeed * Math.sin(FRmoduleAng);
 
     robotX += velocityX;
     robotY += velocityY;
-    SmartDashboard.putNumber("X velocity FRmag", FRmoduleSpeed);
-
+    
     SmartDashboard.putNumber("X velocity", velocityX);
     SmartDashboard.putNumber("Y velocity", velocityY);
     SmartDashboard.putNumber("X", robotX);
@@ -327,14 +324,6 @@ public class Robot extends TimedRobot {
 
   // notice, wheel speed is measured in Feet/20ms because its pronounced soccer
   double moduleSpeed(WPI_TalonFX driveMotor, WPI_TalonFX steerMotor) {
-    return (driveMotor.getSelectedSensorVelocity() * Math.PI / 30720) - (swerveRatio * steerMotor.get());
-    /*
-     * velocity /2048 = r/100ms
-     * r/100ms /5 = r/cycle
-     * circumfernce = PI/3
-     * r/cycle *circumfernce = feet/cycle
-     * (velocity/10240)*(PI/3)
-     * (velocity*PI)/30720
-     */
+    return ((driveMotor.getSelectedSensorVelocity()/2867.2)+(steerMotor.getSelectedSensorVelocity()/21948.5714))*(14/25);
   }
 }
